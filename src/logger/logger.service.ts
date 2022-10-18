@@ -17,7 +17,7 @@ export class LoggerService {
     }
 
     error(...args: unknown[]) {
-        this.logger.info(...args);
+        this.logger.error(...args);
     }
 
     warn(...args: unknown[]) {

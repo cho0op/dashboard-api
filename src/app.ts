@@ -2,6 +2,7 @@ import express, {Express} from "express";
 import {Server} from "http";
 import {LoggerService} from "./logger/logger.service";
 import {UsersController} from "./users/users.controller";
+import {ExceptionFilter} from "./errors/exception.filter";
 
 export class App {
     app: Express;
@@ -9,20 +10,27 @@ export class App {
     port: number;
     logger: LoggerService;
     userController: UsersController;
+    exceptionFilter: ExceptionFilter;
 
-    constructor(logger: LoggerService, userController: UsersController) {
+    constructor(logger: LoggerService, userController: UsersController, exceptionFilter: ExceptionFilter) {
         this.app = express();
         this.port = 8000;
         this.logger = logger;
         this.userController = userController;
+        this.exceptionFilter = exceptionFilter;
     }
 
     useRoutes() {
         this.app.use("/users", this.userController.router);
     }
 
+    useExceptionsFilters() {
+        this.app.use(this.exceptionFilter.catch.bind(this.exceptionFilter));
+    }
+
     public async init() {
         this.useRoutes();
+        this.useExceptionsFilters();
         this.server = this.app.listen(this.port);
         this.logger.log("server started on port" + this.port);
     }
