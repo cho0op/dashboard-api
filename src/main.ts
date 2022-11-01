@@ -7,6 +7,8 @@ import { UsersController } from "./users/users.controller";
 import { IExceptionFilter } from "./errors/exception.filter.interface";
 import { App } from "./app";
 import { IUsersController } from "./users/users.controller.interface";
+import { IUsersService } from "./users/users.service.interface";
+import { UsersService } from "./users/users.service";
 
 export interface IAppReturn {
 	appContainer: Container;
@@ -17,6 +19,7 @@ export const appBindings = new ContainerModule((bind: interfaces.Bind) => {
 	bind<ILogger>(TYPES.ILogger).to(LoggerService);
 	bind<IExceptionFilter>(TYPES.ExceptionFilter).to(ExceptionFilter);
 	bind<IUsersController>(TYPES.UsersController).to(UsersController);
+	bind<IUsersService>(TYPES.UsersService).to(UsersService);
 	bind<App>(TYPES.Application).to(App);
 });
 
