@@ -12,12 +12,14 @@ import { User } from "./user.entity";
 import { IUsersService } from "./users.service.interface";
 import { UsersService } from "./users.service";
 import { ValidateMiddleware } from "../common/validate.middleware";
+import { IConfigService } from "../config/config.service.interface";
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
 	constructor(
 		@inject(TYPES.ILogger) private loggerService: ILogger,
 		@inject(TYPES.UsersService) private usersService: IUsersService,
+		@inject(TYPES.ConfigService) private configService: IConfigService,
 	) {
 		super(loggerService);
 		this.bindRoutes([
@@ -44,6 +46,7 @@ export class UsersController extends BaseController implements IUsersController 
 		if (!result) {
 			return next(new HTTPError(422, "User with such email exists"));
 		}
+		this.loggerService.log("configService", this.configService.get("SALT"));
 
 		this.ok(res, { email: result.email });
 	}
