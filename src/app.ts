@@ -46,6 +46,6 @@ export class App {
 		this.useRoutes();
 		this.useExceptionsFilters();
 		this.server = this.app.listen(this.port);
-		this.logger.log("server started on port" + this.port);
+		this.logger.log("server started on port " + this.port);
 	}
 }
