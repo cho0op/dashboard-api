@@ -8,9 +8,7 @@ import { ILogger } from "../logger/logger.interface";
 import { IUsersController } from "./users.controller.interface";
 import { UserLoginDto } from "./dto/user-login.dto";
 import { UserRegisterDto } from "./dto/user-register.dto";
-import { User } from "./user.entity";
 import { IUsersService } from "./users.service.interface";
-import { UsersService } from "./users.service";
 import { ValidateMiddleware } from "../common/validate.middleware";
 import { IConfigService } from "../config/config.service.interface";
 
@@ -48,7 +46,7 @@ export class UsersController extends BaseController implements IUsersController 
 		}
 		this.loggerService.log("configService", this.configService.get("SALT"));
 
-		this.ok(res, { email: result.email });
+		this.ok(res, { email: result.email, id: result.id });
 	}
 
 	public login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction): Response {
