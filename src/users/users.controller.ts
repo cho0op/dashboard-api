@@ -11,6 +11,7 @@ import { UserRegisterDto } from "./dto/user-register.dto";
 import { IUsersService } from "./users.service.interface";
 import { ValidateMiddleware } from "../common/validate.middleware";
 import { IConfigService } from "../config/config.service.interface";
+import { sign } from "jsonwebtoken";
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
@@ -59,6 +60,29 @@ export class UsersController extends BaseController implements IUsersController 
 		if (!result) {
 			return next(new HTTPError(403, "Wrong Email or Password"));
 		}
-		this.ok(res, "login");
+		const jwt = await this.signJWT(body.email, this.configService.get("SECRET"));
+
+		this.ok(res, { jwt });
+	}
+
+	private signJWT(email: string, secret: string): Promise<string> {
+		return new Promise<string>((resolve, reject) => {
+			sign(
+				{
+					email,
+					iat: Math.floor(Date.now() / 1000),
+				},
+				secret,
+				{
+					algorithm: "HS256",
+				},
+				(error, token) => {
+					if (error) {
+						reject(error);
+					}
+					resolve(token as string);
+				},
+			);
+		});
 	}
 }
