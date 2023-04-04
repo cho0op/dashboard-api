@@ -29,10 +29,11 @@ export class UsersService implements IUsersService {
 
 	async validateUser({ email, password }: UserLoginDto): Promise<boolean> {
 		const existedUser = await this.usersRepository.find(email);
-		if (existedUser) {
-			return await compare(password, existedUser?.password);
+		if (!existedUser) {
+			return false;
 		}
+		const newUser = new User(existedUser.email, existedUser.name, existedUser.password);
 
-		return false;
+		return newUser.comparePassword(password);
 	}
 }
