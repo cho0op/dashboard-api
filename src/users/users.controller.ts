@@ -12,6 +12,7 @@ import { IUsersService } from "./users.service.interface";
 import { ValidateMiddleware } from "../common/validate.middleware";
 import { IConfigService } from "../config/config.service.interface";
 import { sign } from "jsonwebtoken";
+import { AuthMiddleware } from "../common/auth.middleware";
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
@@ -33,6 +34,12 @@ export class UsersController extends BaseController implements IUsersController 
 				func: this.register,
 				method: "post",
 				middlewares: [new ValidateMiddleware(UserRegisterDto)],
+			},
+			{
+				path: "/info",
+				func: this.info,
+				method: "get",
+				middlewares: [],
 			},
 		]);
 	}
@@ -63,6 +70,10 @@ export class UsersController extends BaseController implements IUsersController 
 		const jwt = await this.signJWT(body.email, this.configService.get("SECRET"));
 
 		this.ok(res, { jwt });
+	}
+
+	public async info(req: Request, res: Response, next: NextFunction): Promise<void> {
+		this.ok(res, { "123": req.user });
 	}
 
 	private signJWT(email: string, secret: string): Promise<string> {
