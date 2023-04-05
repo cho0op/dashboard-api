@@ -12,9 +12,11 @@ export class AuthMiddleware implements IMiddleware {
 					next();
 				} else if (payload && typeof payload !== "string") {
 					req.user = payload.email;
+					next();
 				}
 			});
+		} else {
+			next();
 		}
-		next();
 	}
 }

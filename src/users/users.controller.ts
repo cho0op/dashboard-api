@@ -13,6 +13,7 @@ import { ValidateMiddleware } from "../common/validate.middleware";
 import { IConfigService } from "../config/config.service.interface";
 import { sign } from "jsonwebtoken";
 import { AuthMiddleware } from "../common/auth.middleware";
+import { GuardMiddleware } from "../common/guard.middleware";
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
@@ -39,7 +40,7 @@ export class UsersController extends BaseController implements IUsersController 
 				path: "/info",
 				func: this.info,
 				method: "get",
-				middlewares: [],
+				middlewares: [new GuardMiddleware()],
 			},
 		]);
 	}
@@ -73,7 +74,9 @@ export class UsersController extends BaseController implements IUsersController 
 	}
 
 	public async info(req: Request, res: Response, next: NextFunction): Promise<void> {
-		this.ok(res, { "123": req.user });
+		const user = await this.usersService.getUserByEmail(req.user);
+
+		this.ok(res, { email: user?.email });
 	}
 
 	private signJWT(email: string, secret: string): Promise<string> {
