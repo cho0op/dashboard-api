@@ -8,6 +8,7 @@ import { UsersService } from "./users.service";
 import { TYPES } from "../types";
 import { User } from "./user.entity";
 import { UserModel } from "@prisma/client";
+import { hash } from "bcryptjs";
 
 const ConfigServiceMock: IConfigService = {
 	get: jest.fn(),
@@ -46,12 +47,43 @@ describe("Users Service", () => {
 		});
 
 		const createdUser = await usersService.createUser({
-			email: "asdasd@asdc.co",
-			name: "asd",
-			password: "123123",
+			email: "test@test.com",
+			name: "test",
+			password: "test",
 		});
 
 		expect(createdUser?.id).toEqual(1);
 		expect(createdUser?.password).not.toEqual(1);
+	});
+
+	it("validateUser - success", async () => {
+		usersRepository.find = jest.fn().mockImplementationOnce(async (): Promise<User> => {
+			const passwordHash = await hash("test", 10);
+			return new User("test@test.com", "test", passwordHash);
+		});
+		const validatedUser = await usersService.validateUser({
+			email: "test@test.com",
+			password: "test",
+		});
+		expect(validatedUser).toBeTruthy();
+	});
+	it("validateUser - wrong password", async () => {
+		usersRepository.find = jest.fn().mockImplementationOnce(async (): Promise<User> => {
+			const passwordHash = await hash("wrongtest", 10);
+			return new User("test@test.com", "test", passwordHash);
+		});
+		const validatedUser = await usersService.validateUser({
+			email: "test@test.com",
+			password: "test",
+		});
+		expect(validatedUser).toBeFalsy();
+	});
+	it("validateUser - no user", async () => {
+		usersRepository.find = jest.fn().mockReturnValueOnce(null);
+		const validatedUser = await usersService.validateUser({
+			email: "test@test.com",
+			password: "test",
+		});
+		expect(validatedUser).toBeFalsy();
 	});
 });
